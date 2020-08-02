@@ -1,19 +1,22 @@
-pool:
-  vmImage: 'Ubuntu-16.04'
+  - stage: main_pipeline
+    displayName: 'main pipeline'
+    jobs:
+    - job: test_job
+      displayName: 'Test Job'
+      pool:
+        vmImage: 'ubuntu-latest'     
+      steps:
+              - task: ms-devlabs.custom-terraform-tasks.custom-terraform-release-task.TerraformTaskV1@0
+                displayName: "Terraform: init"
+                inputs:
+                  command: init
+                  backendType: azurerm
+                  workingDirectory: '$(System.DefaultWorkingDirectory)\01-currency-exchange-microservice-basic\configuration\iaac\azure\kubernetes'
+                  #commandOptions: 
+                  backendServiceArm: 'azure-resource-manager-service-connection'
+                  backendAzureRmResourceGroupName: 'terraform-backend-rg'
+                  backendAzureRmResourceGroupLocation: 'westeurope'
+                  backendAzureRmStorageAccountName: 'storageacctnitinxyz'
+                  backendAzureRmContainerName: 'storageacctnitincontainer'
+                  backendAzureRmKey: 'kubernetes-dev.tfstate'
 
-steps:
-
-- task: TerraformCLI@0
-  inputs:
-    command: 'init'
-    workingDirectory: '$(System.DefaultWorkingDirectory)\01-currency-exchange-microservice-basic\configuration\iaac\azure\kubernetes'
-    #commandOptions: '-var client_id=$(client_id) -var client_secret=$(client_secret) -var ssh_public_key=$(publickey.secureFilePath)'
-    backendType: 'azurerm'
-    checkout: self
-    backendServiceArm: 'azure-resource-manager-service-connection'
-    ensureBackend: true
-    backendAzureRmResourceGroupName: 'terraform-backend-rg'
-    backendAzureRmResourceGroupLocation: 'westeurope'
-    backendAzureRmStorageAccountName: 'storageacctnitinxyz'
-    backendAzureRmContainerName: 'storageacctnitincontainer'
-    backendAzureRmKey: 'kubernetes-dev.tfstate'
