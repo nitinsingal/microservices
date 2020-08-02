@@ -11,10 +11,12 @@ steps:
 - bash: ls -R $(System.DefaultWorkingDirectory)
 - bash: echo $(Build.ArtifactStagingDirectory)
 - bash: echo $(Build.ArtifactStagingDirectory)
-- bash: java -version
-- bash: node --version
+- bash: java -version; wheris java
+- bash: where node 
 - bash: python --version 
-- bash: terraform --version 
+- bash: terraform --version
+- bash: wheris terraform
+- bash: echo $PATH 
 
 
 - task: DownloadSecureFile@1
