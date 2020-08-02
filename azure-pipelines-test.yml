@@ -9,6 +9,7 @@ steps:
     workingDirectory: '$(System.DefaultWorkingDirectory)\01-currency-exchange-microservice-basic\configuration\iaac\azure\kubernetes'
     #commandOptions: '-var client_id=$(client_id) -var client_secret=$(client_secret) -var ssh_public_key=$(publickey.secureFilePath)'
     backendType: 'azurerm'
+    checkout: self
     backendServiceArm: 'azure-resource-manager-service-connection'
     ensureBackend: true
     backendAzureRmResourceGroupName: 'terraform-backend-rg'
