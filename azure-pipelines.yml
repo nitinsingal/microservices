@@ -11,11 +11,10 @@ steps:
 - bash: ls -R $(System.DefaultWorkingDirectory)
 - bash: echo $(Build.ArtifactStagingDirectory)
 - bash: echo $(Build.ArtifactStagingDirectory)
-- bash: java -version; wheris java
-- bash: where node 
+- bash: whereis node 
 - bash: python --version 
 - bash: terraform --version
-- bash: wheris terraform
+- bash: whereis terraform
 - bash: echo $PATH 
 
 
