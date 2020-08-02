@@ -1,4 +1,4 @@
-  - stage: main_pipeline
+- stage: main_pipeline
     displayName: 'main pipeline'
     jobs:
     - job: test_job
