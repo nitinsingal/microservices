@@ -5,8 +5,8 @@ resources:
 - repo: self
 
 variables:
-  tag: '$(Build.BuildId)'
-
+  #tag: '$(Build.BuildId)'
+  tag: 40
 stages:
 - stage: Build
   displayName: Build image
@@ -16,10 +16,39 @@ stages:
     pool:
       vmImage: 'ubuntu-latest'
     steps:
-    - task: Docker@2
+    #- task: Docker@2
+    #  inputs:
+    #    containerRegistry: 'nitin-docker-hub'
+    #    repository: 'nitinsingal73/currency-exchange-devops'
+    #    command: 'buildAndPush'
+    #    Dockerfile: '**/Dockerfile'
+    #    tags: '$(tag)'
+
+    - task: PublishBuildArtifacts@1
       inputs:
-        containerRegistry: 'nitin-docker-hub'
-        repository: 'nitinsingal73/currency-exchange-devops'
-        command: 'buildAndPush'
-        Dockerfile: '**/Dockerfile'
-        tags: '$(tag)'
+        PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+        ArtifactName: 'manifests'
+        publishLocation: 'Container'
+
+
+- stage: Deploy
+  displayName: Deploy image
+  jobs:  
+  - job: Deploy
+    displayName: Deploy
+    pool:
+      vmImage: 'ubuntu-latest'
+    steps:
+    - task: DownloadPipelineArtifact@2
+      inputs:
+        buildType: 'current'
+        artifactName: 'manifests'
+        itemPattern: '**/*.yaml'
+        targetPath: '$(System.ArtifactsDirectory)'
+    - task: KubernetesManifest@0
+      inputs:
+        action: 'deploy'
+        kubernetesServiceConnection: 'aws-kubernetes-cluster-service-connection'
+        namespace: 'default'
+        manifests: '$(System.ArtifactsDirectory)/configuration/kubernetes/deployment.yaml'
+        containers: in28min/currency-exchange-devops:$(tag)
