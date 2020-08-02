@@ -7,6 +7,9 @@ pool:
 steps:
 - script: echo K8S Terraform Azure!
   displayName: 'Run a one-line script'
+  - bash: echo $(System.DefaultWorkingDirectory)
+  - bash: ls -R $(System.DefaultWorkingDirectory)
+  - bash: echo $(Build.ArtifactStagingDirectory)
 
 - task: DownloadSecureFile@1
   name: publickey
