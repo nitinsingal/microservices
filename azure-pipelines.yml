@@ -10,6 +10,12 @@ steps:
 - bash: echo $(System.DefaultWorkingDirectory)
 - bash: ls -R $(System.DefaultWorkingDirectory)
 - bash: echo $(Build.ArtifactStagingDirectory)
+- bash: echo $(Build.ArtifactStagingDirectory)
+- bash: java -version
+- bash: node --version
+- bash: python --version 
+- bash: terraform --version 
+
 
 - task: DownloadSecureFile@1
   name: publickey
