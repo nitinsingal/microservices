@@ -5,8 +5,8 @@ resources:
 - repo: self
 
 variables:
-  tag: '$(Build.BuildId)'
-
+  #tag: '$(Build.BuildId)'
+  tag: 40
 stages:
 - stage: Build
   displayName: Build image
@@ -16,10 +16,44 @@ stages:
     pool:
       vmImage: 'ubuntu-latest'
     steps:
-    - task: Docker@2
+    #- task: Docker@2
+    #  inputs:
+    #    containerRegistry: 'nitin-docker-hub'
+    #    repository: 'nitinsingal73/currency-exchange-devops'
+    #    command: 'buildAndPush'
+    #    Dockerfile: '**/Dockerfile'
+    #    tags: '$(tag)'
+
+    - task: CopyFiles@2
       inputs:
-        containerRegistry: 'nitin-docker-hub'
-        repository: 'nitisingal73/currency-exchange-devops'
-        command: 'buildAndPush'
-        Dockerfile: '**/Dockerfile'
-        tags: '$(tag)'
+        SourceFolder: '$(System.DefaultWorkingDirectory)'
+        Contents: '01-currency-exchange-microservice-basic/**/*.yaml'
+        TargetFolder: '$(Build.ArtifactStagingDirectory)'
+    - task: PublishBuildArtifacts@1
+      inputs:
+        PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+        ArtifactName: 'manifests'
+        publishLocation: 'Container'
+
+
+- stage: Deploy
+  displayName: Deploy image
+  jobs:  
+  - job: Deploy
+    displayName: Deploy
+    pool:
+      vmImage: 'ubuntu-latest'
+    steps:
+    - task: DownloadPipelineArtifact@2
+      inputs:
+        buildType: 'current'
+        artifactName: 'manifests'
+        itemPattern: '**/deployment.yaml'
+        targetPath: '$(System.ArtifactsDirectory)'
+    - task: KubernetesManifest@0
+      inputs:
+        action: 'deploy'
+        kubernetesServiceConnection: 'azure-kubernetes'
+        namespace: 'default'
+        manifests: '$(System.ArtifactsDirectory)/01-currency-exchange-microservice-basic/configuration/kubernetes/deployment.yaml'
+        containers: 'nitinsingal73/currency-exchange-devops:$(tag)'
